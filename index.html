@@ -13,9 +13,7 @@
 body {
     margin: 0;
     font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, #c96b3c, #a04b2a, #1a1a1a);
-    background-size: 200% 200%;
-    animation: gradientMove 15s ease infinite;
+    background: url('fondo.jpg') center center / cover no-repeat fixed;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -23,20 +21,26 @@ body {
     color: white;
 }
 
-@keyframes gradientMove {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+/* Oscurece un poco el fondo para mejor contraste */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(4px);
+    z-index: 0;
 }
 
 .card {
+    position: relative;
+    z-index: 1;
     width: 420px;
     padding: 40px;
     border-radius: 24px;
     backdrop-filter: blur(25px);
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.15);
-    box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
 }
 
 h1 {
@@ -89,7 +93,7 @@ h1 {
 .history {
     margin-top: 25px;
     font-size: 12px;
-    opacity: 0.7;
+    opacity: 0.8;
     max-height: 100px;
     overflow-y: auto;
 }
@@ -107,25 +111,25 @@ h1 {
     <h1>Server Status</h1>
     <div class="server-ip">rosarioniggers.minehost.pro</div>
 
-    <div id="status" class="status">Checking...</div>
+    <div id="status" class="status">Verificando...</div>
     <div id="since"></div>
 
     <div class="section">
-        Players: <span id="players-text">-</span>
+        Jugadores: <span id="players-text">-</span>
         <div class="bar">
             <div id="players-bar" class="bar-fill"></div>
         </div>
     </div>
 
-    <div class="section">Latency: <span id="latency">-</span></div>
-    <div class="section">Uptime today: <span id="uptime">-</span></div>
+    <div class="section">Latencia: <span id="latency">-</span></div>
+    <div class="section">Uptime de hoy: <span id="uptime">-</span></div>
 
     <div class="history">
-        <strong>Recent downtimes:</strong>
+        <strong>Últimas caídas:</strong>
         <ul id="history-list"></ul>
     </div>
 
-    <div class="footer">Auto refresh every 30 seconds</div>
+    <div class="footer">Actualiza automáticamente cada 30 segundos</div>
 </div>
 
 <script>
@@ -169,6 +173,7 @@ async function checkServer() {
 
         if (isOnline) uptimeChecks++;
 
+        document.getElementById("latencia");
         document.getElementById("latency").textContent = latency + " ms";
 
         if (isOnline) {
@@ -190,9 +195,9 @@ async function checkServer() {
             const duration = formatDuration(now - lastChange);
 
             if (!isOnline) {
-                downtimeHistory.push(`${new Date().toLocaleString()} - went offline (was online ${duration})`);
+                downtimeHistory.push(`${new Date().toLocaleString()} - se cayó (estuvo online ${duration})`);
             } else {
-                downtimeHistory.push(`${new Date().toLocaleString()} - back online`);
+                downtimeHistory.push(`${new Date().toLocaleString()} - volvió a estar online`);
             }
 
             localStorage.setItem("downtimeHistory", JSON.stringify(downtimeHistory));
@@ -209,8 +214,8 @@ async function checkServer() {
         const sinceDuration = formatDuration(now - lastChange);
         document.getElementById("since").textContent =
             lastStatus === "online"
-                ? `Online for ${sinceDuration}`
-                : `Offline for ${sinceDuration}`;
+                ? `Online desde hace ${sinceDuration}`
+                : `Offline desde hace ${sinceDuration}`;
 
         localStorage.setItem("uptimeChecks", uptimeChecks);
         localStorage.setItem("totalChecks", totalChecks);
