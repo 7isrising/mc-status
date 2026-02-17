@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Status - rosarioniggers.minehost.pro</title>
+
+<style>
+body {
+    margin: 0;
+    background: linear-gradient(135deg, #0f0f0f, #1c1c1c);
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.container {
+    background: #141414;
+    padding: 40px;
+    border-radius: 20px;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(0,255,150,0.1);
+}
+h1 {
+    margin-bottom: 10px;
+}
+.status {
+    font-size: 36px;
+    margin: 20px 0;
+}
+.online { color: #00ff88; }
+.offline { color: #ff4444; }
+.info {
+    margin-top: 10px;
+    opacity: 0.8;
+}
+.footer {
+    margin-top: 20px;
+    font-size: 12px;
+    opacity: 0.5;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Server Status</h1>
+    <div id="ip">rosarioniggers.minehost.pro</div>
+    <div class="status" id="status">Verificando...</div>
+    <div class="info" id="players"></div>
+    <div class="info" id="version"></div>
+    <div class="info" id="ping"></div>
+    <div class="footer">Actualiza cada 30 segundos</div>
+</div>
+
+<script>
+const serverIP = "rosarioniggers.minehost.pro";
+
+async function checkServer() {
+    try {
+        const response = await fetch(`https://api.mcsrvstat.us/2/${serverIP}`);
+        const data = await response.json();
+
+        if (data.online) {
+            document.getElementById("status").innerText = "🟢 ONLINE";
+            document.getElementById("status").className = "status online";
+            document.getElementById("players").innerText =
+                `Jugadores: ${data.players.online} / ${data.players.max}`;
+            document.getElementById("version").innerText =
+                `Versión: ${data.version}`;
+            document.getElementById("ping").innerText =
+                `Ping: ${data.debug.ping ? "OK" : "Sin respuesta"}`;
+        } else {
+            document.getElementById("status").innerText = "🔴 OFFLINE";
+            document.getElementById("status").className = "status offline";
+            document.getElementById("players").innerText = "";
+            document.getElementById("version").innerText = "";
+            document.getElementById("ping").innerText = "";
+        }
+    } catch (error) {
+        document.getElementById("status").innerText = "⚠ ERROR";
+        document.getElementById("status").className = "status offline";
+    }
+}
+
+checkServer();
+setInterval(checkServer, 30000);
+</script>
+
+</body>
+</html>
